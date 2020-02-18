@@ -1,0 +1,43 @@
+,,,        ORG  0000H              ;主程序入口
+0000,02 01 00,,        LJMP  MAIN
+,,,        ORG  0023H              ;串行中断入口
+0023,02 01 1B,,        LJMP SERVE2
+,,,        ORG  0100H
+0100,75 89 20,MAIN,MAIN:   MOV  TMOD, #20H         ;将T1设为工作方式2
+0103,75 8D F3,,        MOV  TH1, #0F3H         ;fosc=6MHz时，BD=2400
+0106,75 8B F3,,        MOV  TL1, #0F3H
+0109,D2 8E,,        SETB  TR1               ;启动T1
+010B,75 87 80,,        MOV  PCON, #80H         ;Smod=1
+010E,75 98 D0,,        MOV  SCON, #0D0H        ;串行口设为工作方式3， 允许接收
+0111,78 40,,        MOV  R0, #40H           ;数据块首地址
+0113,7F 10,,        MOV R7, #10H            ;接收字节数
+0115,D2 AC,,        SETB ES                 ;允许串行口中断
+0117,D2 AF,,        SETB EA                 ;开中断
+0119,80 FE,,        SJMP $                  ;等待中断
+,,,
+,,,;接收方单片机的中断服务程序：
+011B,10 98 04,SERVE2,SERVE2: JBC  RI, LOOP           ;是接收中断，清零RI，转入接收
+011E,C2 99,,        CLR  TI                 ;是发送中断，清零TI
+0120,80 23,,        SJMP ENDT
+0122,E5 99,LOOP,LOOP:   MOV  A, SBUF            ;接收数据
+0124,A2 D0,,        MOV  C, P               ;奇偶标志送C
+0126,40 06,,        JC   LOOP1              ;为奇数，转入LOOP1
+0128,72 9A,,        ORL  C, RB8             ;为偶数，检测RB8
+012A,40 06,,        JC   LOOP2              ;奇偶校验出错
+012C,80 0A,,        SJMP LOOP3
+012E,82 9A,LOOP1,LOOP1:  ANL  C, RB8             ;检测RB8
+0130,40 06,,        JC   LOOP3              ;奇偶校验正确
+0132,74 FF,LOOP2,LOOP2:  MOV  A, #0FFH
+0134,F5 99,,        MOV  SBUF, A            ;发送“不正确”应答信号
+0136,80 0D,,        SJMP ENDT
+0138,F6,LOOP3,LOOP3:  MOV @R0, A              ;存放接收数据
+0139,C4,,        SWAP A
+013A,F5 90,,        MOV P1,A
+013C,74 00,,        MOV  A, #00H
+013E,F5 99,,        MOV  SBUF, A            ;发送“正确”应答信号
+0140,08,,        INC  R0                 ;修改数据指针
+0141,DF 02,,        DJNZ R7, ENDT           ;未接收完数据
+0143,C2 AC,,        CLR  ES                 ;全部数据接收完毕， 禁止串行口中断
+0145,32,ENDT,ENDT:   RETI                    ;中断返回
+,,,
+000E,,,        END

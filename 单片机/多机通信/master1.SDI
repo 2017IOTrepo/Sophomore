@@ -1,0 +1,70 @@
+,,,                ORG     00H
+0000,01 30,,                AJMP    MAIN
+,,,
+,,,                ORG     30H
+0030,75 89 20,MAIN,MAIN:           MOV     TMOD,#20H
+0033,75 8D FD,,                MOV     TH1,#0FDH
+0036,75 8B FD,,                MOV     TL1,#0FDH
+0039,D2 8E,,                SETB    TR1
+003B,75 87 00,,                MOV     PCON,#0
+,,,
+003E,75 98 D8,,                MOV     SCON,#0D8H
+,,,
+,,,
+0041,7D 00,,                MOV     R5,#00H
+,,,
+0043,D2 AC,,                SETB    ES
+0045,D2 AF,,                SETB    EA
+,,,
+0047,7E 00,,                MOV     R6,#00H
+0049,7F 00,,                MOV     R7,#00H
+,,,
+004B,,LOOP,LOOP:
+,,,                ;MOV    P2,R5
+004B,74 FF,,                MOV     A,#0FFH
+004D,F5 B0,,                MOV     P3,A
+,,,
+004F,30 B3 05,,                JNB     P3.3,PRESTX
+0052,30 B5 23,,                JNB     P3.5,PRESRX
+0055,01 4B,,                AJMP    LOOP
+,,,
+0057,30 B3 FD,PRESTX,PRESTX:         JNB     P3.3,$
+005A,7A 07,,                MOV     R2,#07H                 ;从机1的地址送R2
+005C,D2 9B,,                SETB    TB8
+005E,EA,,                MOV     A,R2
+005F,F5 99,,                MOV     SBUF,A;发送地址
+0061,30 99 FD,,                JNB     TI,$
+0064,C2 99,,                CLR     TI
+0066,0E,,                INC     R6
+0067,BE 0A 02,,                CJNE    R6,#0AH,L2
+006A,7E 00,,                MOV     R6,#00H
+006C,,L2,L2:
+006C,C2 9B,,                CLR     TB8
+006E,EE,,                MOV     A,R6
+006F,F5 99,,                MOV     SBUF,A;发送数据
+0071,30 99 FD,,                JNB     TI,$
+0074,C2 99,,                CLR     TI
+0076,01 4B,,                AJMP    LOOP
+,,,
+0078,30 B5 FD,PRESRX,PRESRX:         JNB     P3.5,$
+007B,7B 0F,,                MOV     R3,#0FH                 ;从机1的地址送R3
+007D,EB,,                MOV     A,R3
+007E,D2 9B,,                SETB    TB8
+0080,F5 99,,                MOV     SBUF,A
+0082,30 99 FD,,                JNB     TI,$
+0085,C2 99,,                CLR     TI
+0087,0F,,                INC     R7
+0088,BF 0A 02,,                CJNE    R7,#0AH,L1
+008B,7F 00,,                MOV     R7,#00H
+008D,,L1,L1:
+008D,EF,,                MOV     A,R7
+008E,C2 9B,,                CLR     TB8
+0090,F5 99,,                MOV     SBUF,A
+0092,30 99 FD,,                JNB     TI,$
+0095,C2 99,,                CLR     TI
+0097,01 4B,,                AJMP    LOOP
+000E,,,                END
+,,,
+,,,
+,,,
+,,,

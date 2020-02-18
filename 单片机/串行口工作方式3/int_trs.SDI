@@ -1,0 +1,70 @@
+,,,        ORG  0000H              ;主程序入口
+0000,02 01 00,,        LJMP  MAIN
+,,,        ORG  0023H              ;串行中断入口
+0023,02 01 36,,        LJMP SERVE1
+,,,        ORG  0100H
+0100,75 81 60,MAIN,MAIN:   MOV SP,#60h
+0103,78 40,,        MOV R0,#40H
+0105,74 00,,        MOV A,#00
+0107,7C 10,,        MOV R4,#10H
+0109,F6,LP,LP:     MOV @R0,A
+010A,08,,        INC R0
+010B,04,,        INC A
+010C,DC FB,,        DJNZ R4,LP
+010E,75 89 20,,        MOV  TMOD, #20H         ;将T1设为工作方式2
+0111,75 8D F3,,        MOV  TH1, #0F3H         ;fosc=6MHz时，BD=2400
+0114,75 8B F3,,        MOV  TL1, #0F3H
+0117,D2 8E,,        SETB  TR1               ;启动T1
+0119,75 87 80,,        MOV  PCON, #80H         ;Smod=1
+011C,75 98 D0,,        MOV  SCON, #0D0H        ;串行口设为工作方式3， 允许接收
+011F,78 40,,        MOV  R0, #40H           ;数据块首地址
+0121,7C 10,,        MOV R4,#10H             ;发送字节数
+0123,D2 AC,,        SETB ES                 ;允许串行口中断
+0125,D2 AF,,        SETB EA                 ;开中断
+0127,E6,,        MOV A, @R0              ;取发送数据
+0128,A2 D0,,        MOV  C, P
+012A,92 9B,,        MOV TB8,C               ;奇偶标志送TB8
+012C,F5 90,,        MOV P1,A
+012E,12 01 6C,,        LCALL DELAY
+0131,F5 99,,        MOV SBUF,A              ;发送数据
+0133,1C,,        DEC R4
+0134,80 FE,,        SJMP $                  ;等待中断
+,,,
+,,,;发送方单片机的中断服务程序：
+0136,C0 E0,SERVE1,SERVE1: PUSH ACC
+0138,C0 D0,,        PUSH PSW
+013A,10 98 04,,        JBC  RI, LOOP           ;是接收中断，清零RI，转入接收应答信息
+013D,C2 99,,        CLR  TI                 ;是发送中断，清零TI
+013F,80 26,,        SJMP ENDT
+0141,E5 99,LOOP,LOOP:   MOV  A, SBUF            ;取应答信息
+0143,C3,,        CLR  C
+0144,94 01,,        SUBB A,#01H             ;判断应答信息是#00H吗？
+0146,40 0E,,        JC   LOOP1              ;是#00H，发送正确
+0148,E6,,        MOV A, @R0              ;否则重发原来数据
+0149,A2 D0,,        MOV  C, P
+014B,92 9B,,        MOV  TB8, C
+014D,F5 99,,        MOV  SBUF, A
+014F,F5 90,,        MOV P1,A
+0151,12 01 6C,,        LCALL DELAY
+0154,80 11,,        SJMP ENDT
+0156,08,LOOP1,LOOP1:  INC  R0                 ;修改地址指针，准备发送下一个数据
+0157,E6,,        MOV A, @R0
+0158,A2 D0,,        MOV  C, P
+015A,92 9B,,        MOV  TB8, C
+015C,F5 99,,        MOV  SBUF, A            ;发送数据
+015E,F5 90,,        MOV P1,A
+0160,12 01 6C,,        LCALL DELAY
+0163,DC 02,,        DJNZ R4, ENDT           ;数据未发送完，继续
+0165,C2 AC,,        CLR  ES                 ;数据全部发送完毕，禁止串行口中断
+0167,D0 D0,ENDT,ENDT:   POP PSW
+0169,D0 E0,,        POP ACC
+016B,32,,        RETI                    ;中断返回
+,,,
+016C,7F 03,DELAY,DELAY:  MOV R7,#3
+016E,7E FF,DD1,DD1:    MOV R6,#0FFH
+0170,7D FF,DD2,DD2:    MOV R5,#0FFH
+0172,DD FE,,        DJNZ R5,$
+0174,DE FA,,        DJNZ R6,DD2
+0176,DF F6,,        DJNZ R7,DD1
+0178,22,,        RET
+000E,,,        END

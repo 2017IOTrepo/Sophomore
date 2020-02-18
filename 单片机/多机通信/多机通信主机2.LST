@@ -1,0 +1,135 @@
+A51 MACRO ASSEMBLER  禵籣蚠_胖_籣2                                                        11/09/2007 22:43:04 PAGE     1
+
+
+MACRO ASSEMBLER A51 V7.10
+OBJECT MODULE PLACED IN 多机通信主机2.OBJ
+ASSEMBLER INVOKED BY: D:\Program Files\keil\C51\BIN\A51.EXE 多机通信主机2.ASM SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                     ORG     00H
+0000 0130              2                     AJMP    MAIN
+0030                   3                     ORG     30H
+0030 758160            4     MAIN:           MOV     SP,#60H
+0033 758920            5                     MOV     TMOD,#20H
+0036 758DFD            6                     MOV     TH1,#0FDH
+0039 758BFD            7                     MOV     TL1,#0FDH       
+                       8             
+003C 7598D8            9                     MOV     SCON,#0D8H
+003F 758700           10                     MOV     PCON,#0
+0042 D28E             11                     SETB    TR1
+0044 7D00             12                     MOV     R5,#00H
+0046 759000           13                     MOV     P1,#00H
+                      14     
+0049 8DA0             15     LOOP:           MOV     P2,R5   
+004B 74FF             16                     MOV     A,#0FFH
+004D F5B0             17                     MOV     P3,A
+004F 30B308           18                     JNB     P3.3,PRESTX
+0052 30B51A           19                     JNB     P3.5,PRESRX
+0055 30B732           20                     JNB     P3.7,JIAYI
+0058 0149             21                     AJMP    LOOP
+                      22     
+005A 30B3FD           23     PRESTX:         JNB     P3.3,$
+005D 759003           24                     MOV     P1,#03H
+0060 7B00             25                     MOV     R3,#00H                 ;接收命令送R3
+0062 7A07             26                     MOV     R2,#07H                 ;从机1的地址送R2
+0064 1197             27                     CALL    MSIO1
+0066 00               28                     NOP
+0067 00               29                     NOP
+0068 00               30                     NOP
+0069 7A0F             31                     MOV     R2,#0FH                 ;从机2的地址送R2
+006B 1197             32                     CALL    MSIO1
+006D 0149             33                     AJMP    LOOP
+                      34     
+006F 30B5FD           35     PRESRX:         JNB     P3.5,$
+0072 759005           36                     MOV     P1,#5H
+0075 7B01             37                     MOV     R3,#01H                 ;发送命令送R3
+0077 7A07             38                     MOV     R2,#7H                  ;从机1的地址送R2
+0079 1197             39                     CALL    MSIO1
+007B 00               40                     NOP
+007C 00               41                     NOP
+007D 00               42                     NOP
+007E ED               43                     MOV     A,R5
+007F FC               44                     MOV     R4,A
+0080 7A0F             45                     MOV     R2,#0FH                 ;从机2的地址送R2
+0082 1197             46                     CALL    MSIO1
+0084 EC               47                     MOV     A,R4
+0085 2D               48                     ADD     A,R5
+0086 D4               49                     DA      A
+0087 FD               50                     MOV     R5,A
+0088 0149             51                     AJMP    LOOP    
+                      52     
+008A 30B7FD           53     JIAYI:          JNB     P3.7,$
+008D 759007           54                     MOV     P1,#7H
+0090 0D               55                     INC     R5
+0091 E4               56                     CLR     A
+0092 2D               57                     ADD     A,R5
+0093 D4               58                     DA      A
+A51 MACRO ASSEMBLER  禵籣蚠_胖_籣2                                                        11/09/2007 22:43:04 PAGE     2
+
+0094 FD               59                     MOV     R5,A
+0095 0149             60                     AJMP    LOOP
+                      61                     
+                      62     
+0097 D29B             63     MSIO1:          SETB    TB8
+0099 EA               64                     MOV     A,R2
+009A F599             65                     MOV     SBUF,A
+009C 3099FD           66                     JNB     TI,$
+009F C299             67                     CLR     TI
+00A1 C29B             68                     CLR     TB8
+00A3 EB               69                     MOV     A,R3
+00A4 F599             70                     MOV     SBUF,A
+00A6 3099FD           71                     JNB     TI,$
+00A9 C299             72                     CLR     TI
+00AB B4000B           73                     CJNE    A,#00H,SRX              
+00AE C29B             74     STX:            CLR     TB8
+00B0 ED               75                     MOV     A,R5
+00B1 F599             76                     MOV     SBUF,A
+00B3 3099FD           77                     JNB     TI,$
+00B6 C299             78                     CLR     TI
+00B8 22               79                     RET
+                      80     
+00B9 3098FD           81     SRX:            JNB     RI,$
+00BC C298             82                     CLR     RI
+00BE E599             83                     MOV     A,SBUF
+00C0 FD               84                     MOV     R5,A
+00C1 22               85                     RET
+                      86                     END
+                             
+                                             
+A51 MACRO ASSEMBLER  禵籣蚠_胖_籣2                                                        11/09/2007 22:43:04 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+JIAYI. . . . . . .  C ADDR   008AH   A   
+LOOP . . . . . . .  C ADDR   0049H   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+MSIO1. . . . . . .  C ADDR   0097H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PCON . . . . . . .  D ADDR   0087H   A   
+PRESRX . . . . . .  C ADDR   006FH   A   
+PRESTX . . . . . .  C ADDR   005AH   A   
+RI . . . . . . . .  B ADDR   0098H.0 A   
+SBUF . . . . . . .  D ADDR   0099H   A   
+SCON . . . . . . .  D ADDR   0098H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+SRX. . . . . . . .  C ADDR   00B9H   A   
+STX. . . . . . . .  C ADDR   00AEH   A   
+TB8. . . . . . . .  B ADDR   0098H.3 A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TI . . . . . . . .  B ADDR   0098H.1 A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

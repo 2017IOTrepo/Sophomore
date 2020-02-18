@@ -1,0 +1,53 @@
+,,,SLAVE           EQU     30H
+,,,                ORG     00H
+0000,01 30,,                AJMP    MAIN
+,,,                ORG     23H
+0023,02 00 58,,                LJMP    SSIO
+,,,
+,,,                ORG     30H
+0030,75 81 60,MAIN,MAIN:           MOV     SP,#60H
+0033,75 89 20,,                MOV     TMOD,#20H
+0036,75 8D FD,,                MOV     TH1,#0FDH
+0039,75 8B FD,,                MOV     TL1,#0FDH
+003C,D2 AF,,                SETB    EA              ;串行口开中断
+003E,D2 AC,,                SETB    ES
+0040,75 98 D8,,                MOV     SCON,#0D8H
+0043,75 87 00,,                MOV     PCON,#0
+0046,D2 8E,,                SETB    TR1
+0048,D2 9D,,                SETB    SM2
+,,,
+004A,74 FF,,                MOV     A,#0FFH
+004C,F5 90,,                MOV     P1,A
+004E,E5 90,,                MOV     A,P1
+0050,F5 30,,                MOV     SLAVE,A
+0052,7D 00,,                MOV     R5,#00H
+0054,,DISPLAY,DISPLAY:
+0054,8D A0,,                MOV     P2,R5
+0056,01 54,,                AJMP    DISPLAY
+0058,,SSIO,SSIO:
+0058,C0 E0,,                PUSH    Acc
+005A,C2 98,,                CLR     RI
+005C,20 9A 0A,,                JB      RB8,ADDR
+005F,E5 99,,                MOV     A,SBUF
+0061,FD,,                MOV     R5,A
+0062,D0 E0,RETURN,RETURN:         POP     Acc
+0064,D2 AC,,                SETB    ES
+0066,D2 9D,,                SETB    SM2
+0068,32,,                RETI
+0069,,ADDR,ADDR:
+0069,E5 99,,                MOV     A,SBUF
+006B,65 30,,                XRL     A,SLAVE
+006D,60 05,,                JZ      CORRECT
+006F,D2 9D,,                SETB    SM2
+0071,D0 E0,,                POP     Acc
+0073,32,,                RETI
+0074,,CORRECT,CORRECT:
+,,,
+0074,C2 9D,,                CLR     SM2
+0076,D0 E0,,                POP     ACC
+0078,32,,                RETI
+,,,
+000E,,,                END
+,,,
+,,,
+,,,

@@ -1,0 +1,59 @@
+,,,SLAVE           EQU     30H
+,,,                ORG     00H
+0000,01 30,,                AJMP    MAIN
+,,,                ORG     23H
+0023,02 00 58,,                LJMP    SSIO
+,,,
+,,,                ORG     30H
+0030,75 81 60,MAIN,MAIN:           MOV     SP,#60H
+0033,75 89 20,,                MOV     TMOD,#20H
+0036,75 8D FD,,                MOV     TH1,#0FDH
+0039,75 8B FD,,                MOV     TL1,#0FDH
+003C,D2 AF,,                SETB    EA              ;串行口开中断
+003E,D2 AC,,                SETB    ES
+0040,75 98 D8,,                MOV     SCON,#0D8H
+0043,75 87 00,,                MOV     PCON,#0
+0046,D2 8E,,                SETB    TR1
+0048,D2 9D,,                SETB    SM2
+,,,
+004A,74 FF,,                MOV     A,#0FFH
+004C,F5 90,,                MOV     P1,A
+004E,E5 90,,                MOV     A,P1
+0050,F5 30,,                MOV     SLAVE,A
+0052,7D 00,,                MOV     R5,#00H
+0054,,DISPLAY,DISPLAY:
+0054,8D A0,,                MOV     P2,R5
+0056,01 54,,                AJMP    DISPLAY
+,,,
+0058,C2 98,SSIO,SSIO:           CLR     RI
+005A,C2 AC,,                CLR     ES
+,,,
+005C,C0 E0,,                PUSH    ACC
+005E,C0 D0,,                PUSH    PSW
+,,,                ;SETB   RS1
+,,,                ;CLR    RS0
+,,,
+0060,E5 99,,                MOV     A,SBUF
+0062,65 30,,                XRL     A,SLAVE
+0064,60 09,,                JZ      SSIO1
+,,,
+0066,D0 D0,RETURN,RETURN:         POP     PSW
+0068,D0 E0,,                POP     ACC
+006A,D2 AC,,                SETB    ES
+006C,D2 9D,,                SETB    SM2
+006E,32,,                RETI
+,,,
+006F,C2 9D,SSIO1,SSIO1:          CLR     SM2
+0071,E5 30,,                MOV     A,SLAVE
+0073,F5 99,,                MOV     SBUF,A
+0075,30 99 FD,,                JNB     TI,$
+0078,30 98 FD,,                JNB     RI,$
+007B,C2 98,,                CLR     RI
+,,,
+007D,E5 99,SSIO2,SSIO2:          MOV     A,SBUF
+007F,FD,,                MOV     R5,A
+0080,01 66,,                AJMP    RETURN
+,,,
+000E,,,                END
+,,,
+,,,

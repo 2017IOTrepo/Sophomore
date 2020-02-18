@@ -1,0 +1,195 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	slave2.asm
+	Object File:	slave2.hex
+	List File:	slave2.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:		N      0030	SLAVE		EQU	30H
+    2:		N      0000			ORG	00H
+    3:	  0000	01 30				AJMP	MAIN
+    4:		N      0023			ORG	23H
+    5:	  0023	02 00 58			LJMP	SSIO
+    6:
+    7:		N      0030			ORG	30H
+    8:	  0030	75 81 60	MAIN:		MOV	SP,#60H
+    9:	  0033	75 89 20			MOV	TMOD,#20H
+   10:	  0036	75 8D FD			MOV	TH1,#0FDH
+   11:	  0039	75 8B FD			MOV	TL1,#0FDH
+   12:	  003C	D2 AF				SETB	EA		;串行口开中断
+   13:	  003E	D2 AC				SETB	ES
+   14:	  0040	75 98 D8			MOV	SCON,#0D8H
+   15:	  0043	75 87 00			MOV	PCON,#0
+   16:	  0046	D2 8E				SETB	TR1
+   17:	  0048	D2 9D				SETB	SM2
+   18:
+   19:	  004A	74 FF				MOV	A,#0FFH
+   20:	  004C	F5 90				MOV	P1,A
+   21:	  004E	E5 90				MOV	A,P1
+   22:	  0050	F5 30				MOV	SLAVE,A
+   23:	  0052	7D 00				MOV	R5,#00H
+   24:	  0054			DISPLAY:
+   25:	  0054	8D A0				MOV	P2,R5
+   26:	  0056	01 54				AJMP	DISPLAY
+   27:
+   28:	  0058	C2 98		SSIO:		CLR	RI
+   29:	  005A	C2 AC				CLR	ES
+   30:
+   31:	  005C	C0 E0				PUSH	ACC
+   32:	  005E	C0 D0				PUSH	PSW
+   33:						;SETB	RS1
+   34:						;CLR	RS0
+   35:
+   36:	  0060	E5 99				MOV	A,SBUF
+   37:	  0062	65 30				XRL	A,SLAVE
+   38:	  0064	60 09				JZ	SSIO1
+   39:
+   40:	  0066	D0 D0		RETURN:		POP	PSW
+   41:	  0068	D0 E0				POP	ACC
+   42:	  006A	D2 AC				SETB	ES
+   43:	  006C	D2 9D				SETB	SM2
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+   44:	  006E	32				RETI
+   45:
+   46:	  006F	C2 9D		SSIO1:		CLR	SM2
+   47:	  0071	E5 30				MOV	A,SLAVE
+   48:	  0073	F5 99				MOV	SBUF,A
+   49:	  0075	30 99 FD			JNB	TI,$
+   50:	  0078	30 98 FD			JNB	RI,$
+   51:	  007B	C2 98				CLR	RI
+   52:
+   53:	  007D	E5 99		SSIO2:		MOV	A,SBUF
+   54:	  007F	FD				MOV	R5,A
+   55:	  0080	01 66				AJMP	RETURN
+   56:
+   57:						END
+   58:
+   59:
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+B				  DATA	      F0
+CY				  BIT	      D7
+DISPLAY				  CODE	    0054	  24
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+MAIN				  CODE	    0030	   8
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+RESET				  CODE	    0000
+RETURN				  CODE	    0066	  40
+RI				  BIT	      98
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+SBUF				  DATA	      99
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+SCON				  DATA	      98
+SINT				  CODE	    0023
+SLAVE				  NUMBER    0030	   1
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+SSIO				  CODE	    0058	  28
+SSIO1				  CODE	    006F	  46
+SSIO2				  CODE	    007D	  53
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WR				  BIT	      B6

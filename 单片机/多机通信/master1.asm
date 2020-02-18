@@ -1,0 +1,70 @@
+		ORG	00H
+		AJMP	MAIN
+		
+		ORG	30H
+MAIN:		MOV	TMOD,#20H
+		MOV	TH1,#0FDH
+		MOV	TL1,#0FDH
+		SETB	TR1
+		MOV	PCON,#0	
+	
+		MOV	SCON,#0D8H
+		
+		
+		MOV	R5,#00H
+
+		SETB	ES
+		SETB	EA
+
+		MOV 	R6,#00H
+		MOV 	R7,#00H
+		
+LOOP:		
+		;MOV	P2,R5
+		MOV	A,#0FFH
+		MOV	P3,A
+		
+		JNB	P3.3,PRESTX
+		JNB	P3.5,PRESRX
+		AJMP	LOOP
+
+PRESTX:		JNB	P3.3,$
+		MOV	R2,#07H			;从机1的地址送R2
+		SETB	TB8
+		MOV	A,R2
+		MOV	SBUF,A;发送地址
+		JNB	TI,$
+		CLR	TI
+		INC	R6
+		CJNE	R6,#0AH,L2
+		MOV	R6,#00H
+L2:		
+		CLR	TB8
+		MOV	A,R6
+		MOV	SBUF,A;发送数据
+		JNB	TI,$
+		CLR	TI			
+		AJMP	LOOP
+
+PRESRX:		JNB	P3.5,$
+		MOV	R3,#0FH			;从机1的地址送R3
+		MOV	A,R3
+		SETB	TB8
+		MOV	SBUF,A
+		JNB	TI,$
+		CLR	TI
+		INC	R7
+		CJNE 	R7,#0AH,L1
+		MOV 	R7,#00H
+L1:		
+		MOV 	A,R7
+		CLR	TB8
+		MOV	SBUF,A
+		JNB	TI,$
+		CLR	TI
+		AJMP	LOOP
+		END
+		
+		
+
+		

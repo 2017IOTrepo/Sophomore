@@ -1,0 +1,80 @@
+,,,                ORG     00H
+0000,01 30,,                AJMP    MAIN
+,,,                ORG     30H
+0030,75 89 20,MAIN,MAIN:           MOV     TMOD,#20H
+0033,75 8D FD,,                MOV     TH1,#0FDH
+0036,75 8B FD,,                MOV     TL1,#0FDH
+,,,
+0039,75 98 D8,,                MOV     SCON,#0D8H
+003C,75 87 00,,                MOV     PCON,#0
+003F,D2 8E,,                SETB    TR1
+0041,7D 00,,                MOV     R5,#00H
+,,,
+0043,7E 00,,                MOV     R6,#00H
+0045,7F 00,,                MOV     R7,#00H
+,,,
+0047,,LOOP,LOOP:
+,,,                ;MOV    P2,R5
+0047,74 FF,,                MOV     A,#0FFH
+0049,F5 B0,,                MOV     P3,A
+,,,
+004B,30 B3 05,,                JNB     P3.3,PRESTX
+004E,30 B5 0C,,                JNB     P3.5,PRESRX
+0051,01 47,,                AJMP    LOOP
+,,,
+0053,30 B3 FD,PRESTX,PRESTX:         JNB     P3.3,$
+0056,7A 07,,                MOV     R2,#07H                 ;从机1的地址送R2
+0058,12 00 67,,                CALL    MSIO1
+005B,01 47,,                AJMP    LOOP
+,,,
+005D,30 B5 FD,PRESRX,PRESRX:         JNB     P3.5,$
+0060,7B 0F,,                MOV     R3,#0FH                 ;从机1的地址送R3
+0062,12 00 8D,,                CALL    MSIO2
+0065,01 47,,                AJMP    LOOP
+,,,
+0067,EA,MSIO1,MSIO1:          MOV     A,R2
+0068,D2 9B,,                SETB    TB8
+006A,F5 99,,                MOV     SBUF,A
+,,,
+006C,30 99 FD,,                JNB     TI,$
+006F,C2 99,,                CLR     TI
+0071,30 98 FD,,                JNB     RI,$
+0074,C2 98,,                CLR     RI
+0076,E5 99,,                MOV     A,SBUF
+0078,6A,,                XRL     A,R2
+0079,60 01,,                JZ      MSIO3
+007B,22,,                RET
+007C,C2 9B,MSIO3,MSIO3:          CLR     TB8
+007E,0F,,                INC     R7
+007F,BF 0A 02,,                CJNE    R7,#0AH,L1
+0082,7F 00,,                MOV     R7,#00H
+0084,EF,L1,L1:             MOV     A,R7
+0085,F5 99,,                MOV     SBUF,A
+0087,30 99 FD,,                JNB     TI,$
+008A,C2 99,,                CLR     TI
+008C,22,,                RET
+,,,
+008D,EB,MSIO2,MSIO2:          MOV     A,R3
+008E,D2 9B,,                SETB    TB8
+0090,F5 99,,                MOV     SBUF,A
+0092,30 99 FD,,                JNB     TI,$
+0095,C2 99,,                CLR     TI
+0097,30 98 FD,,                JNB     RI,$
+009A,C2 98,,                CLR     RI
+009C,E5 99,,                MOV     A,SBUF
+009E,6B,,                XRL     A,R3
+009F,60 01,,                JZ      MSIO7
+00A1,22,,                RET
+00A2,C2 9B,MSIO7,MSIO7:          CLR     TB8
+00A4,0E,,                INC     R6
+00A5,BE 0A 02,,                CJNE    R6,#0AH,L2
+00A8,7E 00,,                MOV     R6,#00H
+00AA,,L2,L2:
+00AA,EE,,                MOV     A,R6
+00AB,F5 99,,                MOV     SBUF,A
+00AD,30 99 FD,,                JNB     TI,$
+00B0,C2 99,,                CLR     TI
+00B2,22,,                RET
+000E,,,                END
+,,,
+,,,

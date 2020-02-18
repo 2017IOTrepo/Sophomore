@@ -1,0 +1,122 @@
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_2                                                        11/14/2007 21:27:43 PAGE     1
+
+
+MACRO ASSEMBLER A51 V7.10
+OBJECT MODULE PLACED IN 多机通信从机2.OBJ
+ASSEMBLER INVOKED BY: D:\Program Files\keil\C51\BIN\A51.EXE 多机通信从机2.ASM SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+  0030                 1     SLAVE           EQU     30H
+0000                   2                     ORG     00H
+0000 0130              3                     AJMP    MAIN
+0023                   4                     ORG     23H
+0023 020061            5                     LJMP    SSIO
+                       6     
+0030                   7                     ORG     30H
+0030 758160            8     MAIN:           MOV     SP,#60H
+0033 758920            9                     MOV     TMOD,#20H
+0036 758DFD           10                     MOV     TH1,#0FDH
+0039 758BFD           11                     MOV     TL1,#0FDH       
+003C D2AF             12                     SETB    EA              ;串行口开中断
+003E D2AC             13                     SETB    ES
+0040 7598D8           14                     MOV     SCON,#0D8H
+0043 758700           15                     MOV     PCON,#0
+0046 D28E             16                     SETB    TR1
+0048 D29D             17                     SETB    SM2
+                      18             
+004A 74FF             19                     MOV     A,#0FFH
+004C F590             20                     MOV     P1,A
+004E E590             21                     MOV     A,P1
+0050 F530             22                     MOV     SLAVE,A
+0052 7D00             23                     MOV     R5,#00H
+0054 8DA0             24     DISPLAY:        MOV     P2,R5
+0056 D2B7             25                     SETB    P3.7
+0058 20B7FD           26                     JB      P3.7,$
+005B 30B7FD           27                     JNB     P3.7,$
+005E 0D               28                     INC     R5
+005F 0154             29                     AJMP    DISPLAY
+                      30     
+0061 C298             31     SSIO:           CLR     RI
+0063 C2AC             32                     CLR     ES
+                      33                     
+0065 C0E0             34                     PUSH    ACC
+0067 C0D0             35                     PUSH    PSW
+0069 D2D4             36                     SETB    RS1
+006B C2D3             37                     CLR     RS0
+                      38                     
+006D E599             39                     MOV     A,SBUF
+006F 6530             40                     XRL     A,SLAVE
+0071 6009             41                     JZ      SSIO1
+                      42     
+0073 D0D0             43     RETURN:         POP     PSW
+0075 D0E0             44                     POP     ACC
+0077 D2AC             45                     SETB    ES
+0079 D29D             46                     SETB    SM2
+007B 32               47                     RETI
+                      48     
+007C C29D             49     SSIO1:          CLR     SM2             
+007E 3098FD           50                     JNB     RI,$
+0081 C298             51                     CLR     RI              
+                      52             
+0083 E599             53     SSIO2:          MOV     A,SBUF
+0085 B4000A           54                     CJNE    A,#00H,STX
+0088 3098FD           55     SRX:            JNB     RI,$            ;接收数据
+008B C298             56                     CLR     RI
+008D E599             57                     MOV     A,SBUF
+008F FD               58                     MOV     R5,A            
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_2                                                        11/14/2007 21:27:43 PAGE     2
+
+0090 0173             59                     AJMP    RETURN  
+0092 ED               60     STX:            MOV     A,R5
+0093 F599             61                     MOV     SBUF,A
+0095 3099FD           62                     JNB     TI,$
+0098 C299             63                     CLR     TI              
+009A 0173             64                     AJMP    RETURN
+                      65     
+                      66                     END
+                             
+                             
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_2                                                        11/14/2007 21:27:43 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+DISPLAY. . . . . .  C ADDR   0054H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ES . . . . . . . .  B ADDR   00A8H.4 A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PCON . . . . . . .  D ADDR   0087H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   0073H   A   
+RI . . . . . . . .  B ADDR   0098H.0 A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+RS1. . . . . . . .  B ADDR   00D0H.4 A   
+SBUF . . . . . . .  D ADDR   0099H   A   
+SCON . . . . . . .  D ADDR   0098H   A   
+SLAVE. . . . . . .  N NUMB   0030H   A   
+SM2. . . . . . . .  B ADDR   0098H.5 A   
+SP . . . . . . . .  D ADDR   0081H   A   
+SRX. . . . . . . .  C ADDR   0088H   A   
+SSIO . . . . . . .  C ADDR   0061H   A   
+SSIO1. . . . . . .  C ADDR   007CH   A   
+SSIO2. . . . . . .  C ADDR   0083H   A   
+STX. . . . . . . .  C ADDR   0092H   A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TI . . . . . . . .  B ADDR   0098H.1 A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

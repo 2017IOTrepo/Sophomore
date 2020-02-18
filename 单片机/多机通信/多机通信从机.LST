@@ -1,0 +1,132 @@
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_                                                         11/07/2007 11:09:59 PAGE     1
+
+
+MACRO ASSEMBLER A51 V7.10
+OBJECT MODULE PLACED IN 多机通信从机.OBJ
+ASSEMBLER INVOKED BY: D:\Program Files\keil\C51\BIN\A51.EXE 多机通信从机.ASM SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+  0030                 1     SLAVE           EQU     30H
+                       2     
+0000                   3                     ORG     00H
+0000 0130              4                     AJMP    MAIN
+0023                   5                     ORG     23H
+0023 02005E            6                     LJMP    SSIO
+0030                   7                     ORG     30H
+0030 758920            8     MAIN:           MOV     TMOD,#20H
+0033 758DFD            9                     MOV     TH1,#0FDH
+0036 758BFD           10                     MOV     TL1,#0FDH       
+0039 D2AF             11                     SETB    EA              ;串行口开中断
+003B D2AC             12                     SETB    ES
+003D 7598D8           13                     MOV     SCON,#0D8H
+0040 758700           14                     MOV     PCON,#0
+0043 D28E             15                     SETB    TR1
+0045 D29D             16                     SETB    SM2
+                      17             
+0047 74FF             18                     MOV     A,#0FFH
+0049 F590             19                     MOV     P1,A
+004B E590             20                     MOV     A,P1
+004D F530             21                     MOV     SLAVE,A
+004F 7D00             22                     MOV     R5,#00H
+0051 8DA0             23     DISPLAY:        MOV     P2,R5
+0053 D2B7             24                     SETB    P3.7
+0055 20B7FD           25                     JB      P3.7,$
+0058 30B7FD           26                     JNB     P3.7,$
+005B 0D               27                     INC     R5
+005C 0151             28                     AJMP    DISPLAY
+                      29     
+005E C298             30     SSIO:           CLR     RI
+                      31                     
+0060 C0E0             32                     PUSH    ACC
+0062 C0D0             33                     PUSH    PSW
+0064 D2D4             34                     SETB    RS1
+0066 C2D3             35                     CLR     RS0
+0068 309A06           36                     JNB     RB8,RETURN
+006B E599             37                     MOV     A,SBUF
+006D 6530             38                     XRL     A,SLAVE
+006F 6005             39                     JZ      SSIO1
+0071 D0D0             40     RETURN:         POP     PSW
+0073 D0E0             41                     POP     ACC
+                      42                     
+0075 32               43                     RETI
+                      44     
+0076 C29D             45     SSIO1:          CLR     SM2
+0078 853099           46                     MOV     SBUF,SLAVE
+007B 3098FD           47                     JNB     RI,$
+007E C298             48                     CLR     RI
+0080 309A04           49                     JNB     RB8,SSIO2
+0083 D29D             50                     SETB    SM2
+0085 80EA             51                     SJMP    RETURN
+0087 E599             52     SSIO2:          MOV     A,SBUF
+0089 B40200           53                     CJNE    A,#2H,NEXT
+008C 4007             54     NEXT:           JC      SSIO3
+008E C299             55                     CLR     TI
+0090 759980           56                     MOV     SBUF,#80H
+0093 80DC             57                     SJMP    RETURN
+0095 600B             58     SSIO3:          JZ      SSIO5
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_                                                         11/07/2007 11:09:59 PAGE     2
+
+0097 759902           59     SSIO4:          MOV     SBUF,#2H
+009A C299             60                     CLR     TI
+009C 8D99             61     LOOP1:          MOV     SBUF,R5
+009E D29D             62                     SETB    SM2
+00A0 80CF             63                     SJMP    RETURN
+                      64     
+00A2 759901           65     SSIO5:          MOV     SBUF,#01H
+00A5 3098FD           66     LOOP2:          JNB     RI,$
+00A8 C298             67                     CLR     RI
+00AA AD99             68                     MOV     R5,SBUF
+00AC 80C3             69                     SJMP    RETURN
+                      70                     END
+                             
+                             
+                             
+                             
+A51 MACRO ASSEMBLER  禵籣蚠_糯踊_                                                         11/07/2007 11:09:59 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+DISPLAY. . . . . .  C ADDR   0051H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ES . . . . . . . .  B ADDR   00A8H.4 A   
+LOOP1. . . . . . .  C ADDR   009CH   A   
+LOOP2. . . . . . .  C ADDR   00A5H   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+NEXT . . . . . . .  C ADDR   008CH   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PCON . . . . . . .  D ADDR   0087H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RB8. . . . . . . .  B ADDR   0098H.2 A   
+RETURN . . . . . .  C ADDR   0071H   A   
+RI . . . . . . . .  B ADDR   0098H.0 A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+RS1. . . . . . . .  B ADDR   00D0H.4 A   
+SBUF . . . . . . .  D ADDR   0099H   A   
+SCON . . . . . . .  D ADDR   0098H   A   
+SLAVE. . . . . . .  N NUMB   0030H   A   
+SM2. . . . . . . .  B ADDR   0098H.5 A   
+SSIO . . . . . . .  C ADDR   005EH   A   
+SSIO1. . . . . . .  C ADDR   0076H   A   
+SSIO2. . . . . . .  C ADDR   0087H   A   
+SSIO3. . . . . . .  C ADDR   0095H   A   
+SSIO4. . . . . . .  C ADDR   0097H   A   
+SSIO5. . . . . . .  C ADDR   00A2H   A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TI . . . . . . . .  B ADDR   0098H.1 A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
